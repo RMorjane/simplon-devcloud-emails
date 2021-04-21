@@ -1,0 +1,43 @@
+- name: Connecting to VM 3
+  hosts: morjaneVM3
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  remote_user: morjane3
+
+  tasks:
+
+   - name: Create directory
+     file:
+       path: /home/morjane/emails
+       state: directory
+       mode: 0775
+
+   - name: Copy files
+     copy:
+       src: /home/morjane/python/scraping/emails/app/
+       dest: /home/morjane/emails/app/
+       mode: 0775
+
+   - name: Install dependencies
+     apt:
+       name:
+         - python3
+         - python3-pip
+         - python3-setuptools
+       state: latest
+       update_cache: True
+
+   - name: Install required pip packages
+     pip:
+       name:
+         - flask
+         - template-render
+         - requests
+         - python-dotenv
+         - psycopg2
+         - bs4
+       executable: pip3
+
+   - name: Running flask app
+     shell: chdir=/home/morjane/emails/app/ python3 main.py
